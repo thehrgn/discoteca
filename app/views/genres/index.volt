@@ -4,7 +4,7 @@
     <div class="four column row">
 
       <div class="right floated column">
-        <button class="ui  primary button">
+        <button class="ui  primary button" id="btnAdd" name="btnAdd">
             <i class="icon add"></i>
             Add Genre
           </button>
@@ -25,13 +25,33 @@
 
 
 
+<div class="ui modal mini">
+  <i class="close icon"></i>
+  <div class="header">
+    New Genre
+  </div>
+  <form class="ui form" name="formAdd" id="formAdd" method="post">
+    <div class="field">
+    <label>Name</label>
+      <div class=" fields">
+        <div class="field">
+          <input type="text" id="nameG" name="nameG" placeholder="Name">
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="actions">
+    <div class="ui deny button" id="btnCancel" name="btnCancel">Cancel</div>
+    <div class="ui positive button " id="btnSave" name="btnSave">OK</div>
+  </div>
+</div>
 
 <script type="text/javascript">
 
 $(document).ready( function () {
 
   //DataTable definition
-var table = $('#tableGenres').DataTable(
+var tableG = $('#tableGenres').DataTable(
   {
     processing:true,
     serverSide:false,
@@ -59,10 +79,34 @@ var table = $('#tableGenres').DataTable(
    }
 );//Close DataTable
 
-
+  $("#btnAdd").click(function (){
+      var modal= $('.ui.modal').modal(
+        {
+        closable  : false,
+        onDeny    : function(){
+          window.alert('Wait not yet!');
+          return false;
+    },
+    onApprove : function() {
+      save(tableG);
+    }
+  }).modal("show");
+    });
 
 } );
 
+function save(tableG)
+{
+  $.ajax({
+        method: "POST",
+          url: "<?php echo $this->url->get('genres/save') ?>",
+        data: { name: $("#nameG").val() }
+      }).done(function( msg ) {
+          //console.log(msg);
+
+          tableG.ajax.reload();
+        });
+}
 
 function editP(vari){}
 function deleteP(va){}

@@ -18,5 +18,23 @@ class GenresController extends \Phalcon\Mvc\Controller
       $this->response->send();
     }
 
+    public function saveAction()
+    {
+      $this->view->disable();
+      if($this->request->isAjax())
+      {
+        $name = $this->request->getPost("name");
+
+        $genre = new Genres();
+        $genre->name = $name ;
+        $genre->save();
+
+        $this->response->setJsonContent(["data"=>$name]);
+        $this->response->setStatusCode(200, "OK");
+        $this->response->send();
+      }
+
+    }
+
 
 }
