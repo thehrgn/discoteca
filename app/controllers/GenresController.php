@@ -33,7 +33,22 @@ class GenresController extends \Phalcon\Mvc\Controller
         $this->response->setStatusCode(200, "OK");
         $this->response->send();
       }
+    }
 
+    public function deleteAction()
+    {
+      $this->view->disable();
+      if($this->request->isAjax())
+      {
+        $id = $this->request->getPost("id");
+
+        $genre = Genres::findFirst($id);
+        $genre->delete();
+
+        $this->response->setJsonContent(["data"=>$id]);
+        $this->response->setStatusCode(200, "OK");
+        $this->response->send();
+      }
     }
 
 
