@@ -25,7 +25,7 @@
 
 
 
-<div class="ui modal mini">
+<div class="ui modal mini" id="modalNew">
   <i class="close icon"></i>
   <div class="header">
     New Genre
@@ -46,6 +46,28 @@
   </div>
 </div>
 
+<!--Modal new producto-->
+
+<div class="ui basic modal delete" id="modalDelete">
+  <div class="ui icon header">
+    <i class="archive icon"></i>
+    Eliminar Producto
+  </div>
+  <div class="content">
+    <p>Eliminara el producto del catalogo y ya no podra usarlo para realizar ventas.</p>
+  </div>
+  <div class="actions">
+    <div class="ui red basic cancel inverted button">
+      <i class="remove icon"></i>
+      No
+    </div>
+    <div class="ui green ok inverted button">
+      <i class="checkmark icon"></i>
+      Si
+    </div>
+  </div>
+</div>
+
 <script type="text/javascript">
 
 $(document).ready( function () {
@@ -53,7 +75,7 @@ $(document).ready( function () {
   //DataTable definition
 var tableG = $('#tableGenres').DataTable(
   {
-    processing:true,
+    processing:false,
     serverSide:false,
     ajax: {
                 "url": "<?php echo $this->url->get('genres/datatable') ?>",
@@ -64,7 +86,7 @@ var tableG = $('#tableGenres').DataTable(
                 {
                    sortable: false,
                    "render": function ( data, type, full, meta ) {
-                       return '<div class="ui buttons"><button class="ui positive button" onclick="editP('+full.id+')"  > <i class="icon edit"></i>                       </button>                       <div class="or" data-text="O"></div> <button class="ui negative button" onclick="deleteP('+full.id+')"><i class="icon erase"></i> </button> </div>';
+                       return '<div class="ui buttons"><button class="ui positive button" onclick="editG('+full.id+')"  > <i class="icon edit"></i> </button> <div class="or" data-text="O"></div> <button class="ui negative button" onclick="deleteG('+full.id+')"><i class="icon erase"></i> </button> </div>';
                    }
                }
               ],
@@ -79,21 +101,24 @@ var tableG = $('#tableGenres').DataTable(
    }
 );//Close DataTable
 
-  $("#btnAdd").click(function (){
-      var modal= $('.ui.modal').modal(
+  $("#btnAdd").click(function ()
+  {
+      $("#modalNew").trigger("reset");
+      var modal= $('#modalNew').modal(
         {
         closable  : false,
         onDeny    : function(){
-          window.alert('Wait not yet!');
-          return false;
-    },
-    onApprove : function() {
-      save(tableG);
-    }
-  }).modal("show");
-    });
+                    return false;
+                    },
+        onApprove : function() {
+                    save(tableG);
+                    }
+        });
 
-} );
+        modal.modal("show");
+  });
+
+});//CLOSE READY function
 
 function save(tableG)
 {
@@ -102,13 +127,34 @@ function save(tableG)
           url: "<?php echo $this->url->get('genres/save') ?>",
         data: { name: $("#nameG").val() }
       }).done(function( msg ) {
-          //console.log(msg);
-
           tableG.ajax.reload();
         });
 }
 
-function editP(vari){}
-function deleteP(va){}
+function editG(id){}
+//function to Delete Genre  ID
+function deleteG(idGenre)
+{  //Confirm delete and submit
+    $('#modalDelete')
+      .modal({
+        //closable  : false,
+        onDeny    : function(){
+          //return true;
+        },
+        onApprove : function() {
+          //Open call ajax
+          $.ajax({
+            type: "POST",
+            url: "<?php echo $this->url->get('genres/delete') ?>",
+            data:{id:idGenre}
+          }).done(function(data)
+          {
+            var tableG = $("#tableGenres").DataTable();
+            tableG.ajax.reload();
+          });
+          //Close call ajax
+        }
+      }).modal('show');
+}
 
 </script>

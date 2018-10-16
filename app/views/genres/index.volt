@@ -25,7 +25,7 @@
 
 
 
-<div class="ui modal mini">
+<div class="ui modal mini" id="modalNew">
   <i class="close icon"></i>
   <div class="header">
     New Genre
@@ -48,7 +48,7 @@
 
 <!--Modal new producto-->
 
-<div class="ui basic modal delete">
+<div class="ui basic modal delete" id="modalDelete">
   <div class="ui icon header">
     <i class="archive icon"></i>
     Eliminar Producto
@@ -86,7 +86,7 @@ var tableG = $('#tableGenres').DataTable(
                 {
                    sortable: false,
                    "render": function ( data, type, full, meta ) {
-                       return '<div class="ui buttons"><button class="ui positive button" onclick="editG('+full.id+')"  > <i class="icon edit"></i> </button> <div class="or" data-text="O"></div> <button class="ui negative button" onclick="deleteG('+full.id+',this)"><i class="icon erase"></i> </button> </div>';
+                       return '<div class="ui buttons"><button class="ui positive button" onclick="editG('+full.id+')"  > <i class="icon edit"></i> </button> <div class="or" data-text="O"></div> <button class="ui negative button" onclick="deleteG('+full.id+')"><i class="icon erase"></i> </button> </div>';
                    }
                }
               ],
@@ -103,7 +103,8 @@ var tableG = $('#tableGenres').DataTable(
 
   $("#btnAdd").click(function ()
   {
-      var modal= $('.ui.modal').modal(
+
+      var modal= $('#modalNew').modal(
         {
         closable  : false,
         onDeny    : function(){
@@ -130,13 +131,12 @@ function save(tableG)
 
 function editG(id){}
 //function to Delete Genre  ID
-function deleteG(idGenre, tableG)
+function deleteG(idGenre)
 {  //Confirm delete and submit
-    $('.ui.modal.delete')
+    $('#modalDelete')
       .modal({
         //closable  : false,
         onDeny    : function(){
-          //console.log("false");
           //return true;
         },
         onApprove : function() {
@@ -147,6 +147,7 @@ function deleteG(idGenre, tableG)
             data:{id:idGenre}
           }).done(function(data)
           {
+            var tableG = $("#tableGenres").DataTable();
             tableG.ajax.reload();
           });
           //Close call ajax
