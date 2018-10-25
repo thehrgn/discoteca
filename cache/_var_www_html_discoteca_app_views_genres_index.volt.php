@@ -1,5 +1,7 @@
 <h1>Genres</h1>
 
+<?= $this->partial('layouts/menu') ?>
+
 <div class="ui grid">
     <div class="four column row">
 
@@ -25,6 +27,7 @@
 
 
 
+
 <div class="ui modal mini" id="modalNew">
   <i class="close icon"></i>
   <div class="header">
@@ -39,6 +42,8 @@
         </div>
       </div>
     </div>
+    <input type="hidden" name="idEdit" id="idEdit" value="">
+    <input type="hidden" name="option" id="option" value="new">
   </form>
   <div class="actions">
     <div class="ui deny button" id="btnCancel" name="btnCancel">Cancel</div>
@@ -103,35 +108,59 @@ var tableG = $('#tableGenres').DataTable(
 
   $("#btnAdd").click(function ()
   {
-      $("#modalNew").trigger("reset");
-      var modal= $('#modalNew').modal(
-        {
-        closable  : false,
-        onDeny    : function(){
-                    return false;
-                    },
-        onApprove : function() {
-                    save(tableG);
-                    }
-        });
-
-        modal.modal("show");
+    $('#option').val('new');
+    $('#idEdit').val('');
+      showModalAdd();
   });
 
 });//CLOSE READY function
 
-function save(tableG)
+//Show modal ADD
+function showModalAdd(){
+  var modal= $('#modalNew').modal(
+    {
+    closable  : true,
+    //onDeny    : function(){    return false;  },
+    onApprove : function() {
+                save();
+                }
+    }).modal("show");
+}
+
+//Save DATA Form AJAX
+function save()
 {
+  var tableG = $("#tableGenres").DataTable();
+  var formulario = $("#modalNew").serialize();
   $.ajax({
         method: "POST",
           url: "<?php echo $this->url->get('genres/save') ?>",
-        data: { name: $("#nameG").val() }
+        data: { formulario
+          /*name:   $("#nameG").val(),
+                option: $("#option").val(),
+                idEdit: $("#idEdit").val(),*/
+              }
       }).done(function( msg ) {
+        console.log(msg);
           tableG.ajax.reload();
         });
-}
 
-function editG(id){}
+}
+//Search byId and Show Modal
+function editG(id)
+{
+  $.ajax({
+        method: "POST",
+          url: "<?php echo $this->url->get('genres/getById') ?>",
+        data: { id:id }
+      }).done(function( data )
+        {
+          $('#nameG').val(data.genre.name);
+          $('#option').val('edit');
+          $('#idEdit').val(data.genre.id);
+          showModalAdd();
+        });
+}
 //function to Delete Genre  ID
 function deleteG(idGenre)
 {  //Confirm delete and submit
